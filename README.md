@@ -85,13 +85,10 @@ Before deploying, ensure the following:
 
 The application container needs to temporarily override its startup behavior to integrate with the sidecar.
 
-1. Depending on whether your container uses **CMD** or **ENTRYPOINT**, update the task definition accordingly.
-
-**CMD**
+1. Depending on whether your container uses **CMD** or further down **ENTRYPOINT**, update the task definition accordingly.
 
 <img width="627" height="166" alt="image" src="https://github.com/user-attachments/assets/7444f30c-f9ea-483c-b2db-b88888dcb27c" />
 
-**ENTRYPOINT**
 
 <img width="616" height="161" alt="image" src="https://github.com/user-attachments/assets/e1921655-4ea9-4feb-b8f0-9d0bcfa0b0ba" />
 
