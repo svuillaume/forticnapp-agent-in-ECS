@@ -1,4 +1,4 @@
-## Embedded Agent vs Sidecar Agent
+## AWS Fargate ECS FortiCNAPP deployment - Embedded Agent vs Sidecar Agent
 
 Lacework FortiCNAPP offers two methods for deployment into AWS Fargate for ECS. The first method is a container image embedded-agent approach, and the second is a sidecar-based approach that utilizes a volume map. In both deployment methods, the agent runs inside the application container.
 
