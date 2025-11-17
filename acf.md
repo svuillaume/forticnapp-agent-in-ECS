@@ -1,87 +1,69 @@
-# FortiCNAPP SCA - How to reduce alert noise - Application Context Filtering 
+# FortiCNAPP SCA: Reducing Alert Noise Through Application Context Filtering
 
-Alert noise in cloud security is when you get tons of alerts, most of them not really important, which can overwhelm your security team. 
-It happens because cloud systems produce so much data, and rules aren’t always set up right. The problem is, it makes it easy for real attacks to hide among all the noise.
+## Understanding Alert Noise
 
-Moderm and Cloud Native application security go beyond simply identifying vulnerable libraries. 
+Alert noise in cloud security occurs when security teams receive an overwhelming volume of alerts, most of which are not genuinely important. This happens because cloud systems generate enormous amounts of data, and security rules are not always optimally configured. The critical risk is that real attacks can easily hide among the noise, compromising security effectiveness.
 
-It’s important to know how libraries are actually used in your application so you can focus on the vulnerabilities that matter most. FortiCNAPP offers two key features to help with this:
+## Modern Cloud-Native Application Security
 
-- **Application Context Filtering (ACF)** – Analyzes **all references** to a vulnerable library in the source code. Currently supported for **Go, Java, and Kotlin**.
-    ACF is available as part of Lacework FortiCNAPP’s CLI. To enable ACF when running a Software Composition Analysis (SCA) scan, you simply include the --acf flag in your command.
-## Run SCA with ACF
+Modern and cloud-native application security goes beyond simply identifying vulnerable libraries. It's essential to understand how libraries are actually used within your application so you can focus on vulnerabilities that truly matter.
 
-You can run the SCA scan with **Application Context Filtering (ACF)** enabled using the `--acf` argument. Because the output can be large, it’s recommended to save the results to a JSON file for easier analysis.
+FortiCNAPP offers two key features to address this challenge:
+
+**Application Context Filtering (ACF)** analyzes all references to a vulnerable library in source code. Currently supported for Go, Java, and Kotlin. ACF is available as part of Lacework FortiCNAPP's CLI. To enable ACF when running a Software Composition Analysis (SCA) scan, include the `--acf` flag in your command.
+
+**Active Vulnerability Detection (AVD)** detects vulnerable functions that are actually executed. This feature is enabled in the FortiCNAPP agent and represents the current integration point between Lacework FortiCNAPP SCA and Active Vulnerability Detection in the CLI and within CI/CD integrations.
+
+## Running SCA with ACF
+
+You can run the SCA scan with Application Context Filtering enabled using the `--acf` argument. Because the output can be large, save results to a JSON file for easier analysis.
 
 ### Example Command
 
 ```bash
 lacework sca scan ./Projects/log4j-sample --acf -o ./Projects/log4j-sample/acf-results.json
+```
 
-- **Active Vulnerability Detection (AVD)** – Detect vulnerable functions that are **actually executed**.
-    Enabled in the FortiCNAPP agent
-    At present, the integration between Lacework FortiCNAPP SCA and Active Vulnerability Detection is available
+## Running SCA with Active Vulnerability Detection
 
-## Run SCA with Active Vulnerability Detection (AVD)
-
-To enable **Active Vulnerability Detection (AVD)** during an SCA scan, use the `--active-only` flag. This tells Lacework FortiCNAPP SCA to filter results and show only vulnerabilities that are **actively used** in your running applications.
+To enable Active Vulnerability Detection during an SCA scan, use the `--active-only` flag. This tells Lacework FortiCNAPP SCA to filter results and show only vulnerabilities that are actively used in your running applications.
 
 ### Example Command
 
 ```bash
 lacework sca scan ./Projects/nodejs-goof --active-only
+```
 
-In the CLI.
+## Comparison: AVD vs. ACF
 
-Within CI/CD integrations.
+**AVD** reduces alerts by checking what's actually used during runtime.
 
-AVD → Reduces alerts by checking what’s actually used during runtime
-ACF → Reduces alerts by checking what parts of your code reference the library
+**ACF** reduces alerts by checking which parts of your code reference the library.
 
-When combined:
-	•	AVD shows real-world exposure
-	•	ACF shows real code impact
-	•	You avoid wasting time on false alarms
-	•	You focus on vulnerabilities that matter now or soon
+When combined, AVD shows real-world exposure and ACF shows real code impact. This approach helps you avoid wasting time on false alarms and focus on vulnerabilities that matter now or soon.
 
-This document explains the differences and provides a code example in **Java**, using **Log4j**, a widely known library with real-world vulnerabilities.
+## Risk-Based Prioritization in FortiCNAPP
 
+FortiCNAPP uses these principles to focus on real threats:
 
-# Risk-Based Prioritization in FortiCNAPP
+Not every vulnerability is equally dangerous. Prioritization is based on the likelihood of exploitation (AVD shows what's actually used) and impact if exploited (ACF shows where it touches critical parts of the app). This allows security teams to fix the riskiest problems first instead of chasing every low-priority alert.
 
-FortiCNAPP uses these principles to focus on the real threats:
+## Case Study: Log4j and Log4Shell
 
-	•	Not every vulnerability is equally dangerous.
-	•	Prioritization is based on:
-	•	Likelihood of exploitation (AVD shows what’s actually used)
-	•	Impact if exploited (ACF shows where it touches critical parts of the app)
-	•	This allows security teams to fix the riskiest problems first instead of chasing every low-priority alert.
+### What is Log4j?
 
+Log4j is a popular Java-based logging library developed by the Apache Software Foundation. It's widely used in Java applications to record messages about application behavior, such as errors, warnings, informational messages, or debugging details.
 
-**What is Log4J**
+### What is the Log4Shell Attack?
 
-Log4j is a popular Java-based logging library developed by the Apache Software Foundation. It’s widely used in Java applications to record (log) messages about the application’s behavior, such as errors, warnings, informational messages, or debugging details.
+Log4Shell (CVE-2021-44228) is a critical remote code execution vulnerability in Apache Log4j 2, discovered in December 2021.
 
-**What Is the Log4Shell Attack?**
+In simple terms: an attacker can send a special command string to a website (perhaps in a login box or chat message), and because the website logs that string, the attacker suddenly gains control of the entire system. No password, no breaking in, no virus download—nothing complicated.
 
-Log4Shell (CVE‑2021‑44228) is a critical remote code execution (RCE) vulnerability in Apache Log4j 2, discovered in December 2021.
+**Quick Facts About Log4Shell:**
 
-In simple terms:
+Log4Shell is a flaw in Log4j 2.0–2.14.1 that is triggered by logging `${jndi:ldap://...}`, allows remote code execution, requires no authentication, and is extremely widespread and easy to exploit.
 
-Imagine someone says a special “secret sentence” into a website — maybe in a login box or a chat message — and just because the website writes that sentence down in its logs, the attacker suddenly gets control of the whole system.
-
-No password.
-No breaking in.
-No downloading a virus.
-Nothing complicated.
-
-#TL;DR: What Is Log4Shell?
-
-	•	A flaw in Log4j 2.0–2.14.1
-	•	Triggered by logging ${jndi:ldap://...}
-	•	Allows remote code execution
-	•	Requires no authentication
-	•	Extremely widespread and easy to exploit
 ---
 
 ## Example: Java Application Using Log4j
@@ -106,19 +88,13 @@ public class MyApp {
 }
 ```
 
-Lets assume the Log4j library has a known vulnerability: **CVE-2021-44228 (log4shell)**.
+Assume the Log4j library has the known vulnerability CVE-2021-44228 (Log4Shell).
 
----
+### 1. Active Use Detection (AVD)
 
-## 1. Active Use Detection (AVD)
+**Concept:** AVD focuses on runtime execution. It flags vulnerabilities only if the vulnerable functions are actively called.
 
-### Concept
-
-AVD focuses on runtime execution. It flags vulnerabilities only if the vulnerable functions are actively called.
-
-### Example Analysis
-
-Suppose in production, only `processUser` is executed. AVD will report:
+**Example Analysis:** Suppose in production only `processUser` is executed. AVD will report:
 
 ```
 Vulnerable Library: Log4j
@@ -126,25 +102,17 @@ Active Usage:
   - processUser(userId) → calls Logger.info
 ```
 
-`generateReport` is ignored because it never runs in production.
+The `generateReport` method is ignored because it never runs in production.
 
-### Pros
+**Advantages:** Reduces false positives by focusing on live usage.
 
-- Reduces false positives by focusing on live usage.
+**Limitations:** Might miss vulnerabilities in code paths not triggered during runtime.
 
-### Cons
+### 2. Application Context Filtering (ACF)
 
-- Might miss vulnerabilities in code paths not triggered during runtime.
+**Concept:** ACF analyzes source code to identify all references to the vulnerable library, regardless of runtime execution.
 
----
-
-## 2. Application Context Filtering (ACF)
-
-### Concept
-
-ACF analyzes the source code to identify all references to the vulnerable library, regardless of runtime execution.
-
-### Example Analysis (Java, Log4j)
+**Example Analysis (Java, Log4j):**
 
 ```
 Vulnerable Library: Log4j
@@ -153,33 +121,23 @@ Library Usage References:
   - generateReport(reportData) → calls Logger.warn
 ```
 
-Shows all potential usage points in the code, helping you prioritize patching and understand impact.
+This approach shows all potential usage points in the code, helping you prioritize patching and understand impact.
 
-### Pros
+**Advantages:** Provides a complete picture of potential impact in Go, Java, and Kotlin projects. Helps prioritize patches based on actual references and context.
 
-- Complete picture of potential impact in Go, Java, and Kotlin projects.
-- Helps prioritize patches based on actual references and context.
+**Limitations:** Some flagged paths may never execute, potentially inflating risk perception. Not available for languages like Python or JavaScript.
 
-### Cons
-
-- Some flagged paths may never execute, potentially inflating risk perception.
-- Not available for languages like Python or JavaScript.
-
----
-
-## 3. Comparison Table
+### 3. Comparison Table
 
 | Feature | AVD (Active Use Detection) | ACF (Application Context Filtering) |
 |---------|---------------------------|-------------------------------------|
-| Basis | Runtime execution | Source code analysis |
-| Focus | What is actively called | All references in code |
-| Goal | Reduce false positives in live usage | Map full impact and prioritize by context |
-| Limitation | Might miss untested code paths | Flags unused code, language support limited to Go, Java, Kotlin |
-| Example (Log4j) | Flags only processUser if generateReport never runs | Flags both processUser and generateReport |
+| **Basis** | Runtime execution | Source code analysis |
+| **Focus** | What is actively called | All references in code |
+| **Goal** | Reduce false positives in live usage | Map full impact and prioritize by context |
+| **Limitation** | Might miss untested code paths | Flags unused code; language support limited to Go, Java, Kotlin |
+| **Log4j Example** | Flags only processUser if generateReport never runs | Flags both processUser and generateReport |
 
----
-
-## 4. Visual Flow
+### 4. Visual Flow
 
 ```
 Log4j Library Vulnerable
@@ -195,13 +153,12 @@ ACF (Application Context Filtering)
 └── generateReport() → FLAGGED ✓
 ```
 
----
+## Conclusion: Value of Each Approach
 
-## 5. Conclusion: Value of Each Approach
+**ACF** is valuable for comprehensive understanding of how vulnerable libraries touch your codebase in supported languages. It's ideal for planning patches and prioritization.
 
-- **ACF** is valuable for a comprehensive understanding of how vulnerable libraries touch your codebase in supported languages. Ideal for planning patches and prioritization.
-- **AVD** is valuable for risk reduction in live systems, focusing on what is actually used and exposed to potential exploitation.
+**AVD** is valuable for risk reduction in live systems, focusing on what is actually used and exposed to potential exploitation.
 
 ### Best Practice
 
-Combining both approaches gives the full picture—you see both the potential impact and the real-world exposure, allowing for smarter security decisions.
+Combining both approaches provides the full picture. You see both the potential impact and the real-world exposure, enabling smarter security decisions. This integrated approach helps security teams reduce alert noise while ensuring no critical vulnerabilities are overlooked.
