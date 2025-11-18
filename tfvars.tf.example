@@ -1,0 +1,9 @@
+# Lacework credentials
+lacework_account    = "my-lacework-account"
+lacework_api_key    = "XXXXXXXX"
+lacework_api_secret = "XXXXXXXX"
+
+# Azure configuration
+azure_subscription_id = "6dced100-9c31-416f-aed1-67e8cfc9fe5f"
+azure_tenant_id       = "YOUR_TENANT_ID"
+region                = "canadacentral"
