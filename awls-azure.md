@@ -31,7 +31,7 @@ https://github.com/lacework/terraform-azure-agentless-scanning/tree/main/preflig
 **Note: the preflight must be successful to go next steps**
 
 ### Step 2: Initialize Terraform
-Run the following command to initialize Terraform and download required providers:
+Run the following command to initialize Terraform and download required providers (i.e: Tenant Integration in a single Region):
 
 ```bash
 terraform {
