@@ -15,6 +15,9 @@ Before you start, ensure you complete the following steps:
 2. **Decide Whether You Need a NAT Gateway (NAT-GW)**  
    Determine if your environment requires a NAT Gateway. This depends on your network egress requirements and how tightly controlled outbound traffic is. If your environment restricts outbound traffic, a NAT-GW may be necessary.
 
+3. **Pick the correct Integration**
+   https://github.com/lacework/terraform-azure-agentless-scanning/tree/main/examples
+   
 ---
 
 ## AWLS Deployment steps
